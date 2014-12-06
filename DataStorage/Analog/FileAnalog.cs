@@ -29,8 +29,14 @@ namespace DataStorage.Analog
             this.dataManager = manager;
             this.Type = type;
             this.Index = index;
-            this.MaxFileSize = 100 * 1024 * 1024; //每个模拟量最大保存为100MB个文件
-            
+            if (type == 0x42) //半自动电压和电流
+            {
+                this.MaxFileSize = 700 * 1024 * 1024; //每个模拟量最大保存为70*10MB个文件
+            }
+            else
+            {
+                this.MaxFileSize = 80 * 1024 * 1024; //每个模拟量最大保存为80MB个文件
+            }
             fileIndex = new FileIndex(this);
             string datName = Path.Combine(manager.StoreDir, type.ToString("X2") + "H-" + index.ToString("000") + ".dat");
             fileData = new FileData(this);
@@ -95,6 +101,7 @@ namespace DataStorage.Analog
             {
                 this.dataManager.PutDataBlock(currentBlock);
                 currentBlock = NewBlock(currentBlock, true);
+                currentBlock.IndexRecord.Type = (byte)((pointNum == -2) ? 1 : 0);
                 currentBlock.AddAnalog(time, value, digit);
             }
 

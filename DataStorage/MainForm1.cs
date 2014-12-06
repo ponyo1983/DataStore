@@ -48,7 +48,7 @@ namespace DataStorage
 
             AnalogDataManager manager = AnalogDataManager.GetInstance();
             DateTime timeBase = DateTime.Now.Date;
-            for (int i = 0; i < 200*24*3600; i++)
+            for (int i = 0; i < 4*24*3600; i++)
             {
                 manager.AddData(0x11, 1, (byte)(i & 0xff), i, timeBase.AddSeconds(i));
             }

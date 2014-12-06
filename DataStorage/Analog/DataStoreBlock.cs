@@ -100,8 +100,9 @@ namespace DataStorage.Analog
             }
             else
             {
+                if ((prevTime - time).TotalSeconds > 30) return -2; //先判断时间回溯
                 if (prevTime.Date != time.Date) return -1;
-                if ((prevTime-time).TotalSeconds > 30) return -2;
+                
                 AddValue(this.PointCount, time, value, digit);
             }
             prevTime = time;
