@@ -22,7 +22,7 @@ namespace DataStorage.Analog
             this.RecordLength = BitConverter.ToInt32(buffer, offset + 16);
             this.RealLength = RecordLength;
 
-            this.Type = buffer[offset + 20];
+            this.Type = (FallbackType)buffer[offset + 20];
         }
         public int Index
         {
@@ -128,7 +128,7 @@ namespace DataStorage.Analog
         /// <summary>
         /// 记录的类型 0：时间连续 1：时间回溯
         /// </summary>
-        public byte Type
+        public FallbackType Type
         {
             get;
             set;
@@ -144,7 +144,7 @@ namespace DataStorage.Analog
             BitConverter.GetBytes(time).CopyTo(data, 8);
             BitConverter.GetBytes(this.BeginOffset).CopyTo(data, 12);
             BitConverter.GetBytes(this.RecordLength).CopyTo(data, 16);
-            data[20] = this.Type;
+            data[20] = (byte)this.Type;
             return data;
         }
 

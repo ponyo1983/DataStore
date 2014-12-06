@@ -76,7 +76,7 @@ namespace DataStorage.Analog
         private void AddValue(int index, DateTime time, float value, byte digit)
         {
             int mills = (int)((time - time.Date).TotalMilliseconds);
-            byte[] timeByte =BitConverter.GetBytes((int)((mills << 4) | (digit & 0x0f)));
+            byte[] timeByte =BitConverter.GetBytes((uint)((mills << 4) | (digit & 0x0f)));
             Array.Copy(timeByte, 0, dataBuffer, index * 8, 4);
             byte[] analogByte = BitConverter.GetBytes(value);
             Array.Copy(analogByte, 0, dataBuffer, index * 8+4, 4);

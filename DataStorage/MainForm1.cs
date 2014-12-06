@@ -83,5 +83,16 @@ namespace DataStorage
             textBox2.Text = time.ToString("yyyy-MM-dd HH:mm:ss");
 
         }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            DateTime timeBegin=DateTime.Now.Date;
+            DateTime timeEnd=timeBegin.AddDays(1).AddSeconds(-1);
+            List<List<AnalogPoint>> list = AnalogDataManager.GetInstance().GetAnalogPoint(0x11, 1, timeBegin, timeEnd);
+            sw.Stop();
+            MessageBox.Show(sw.ElapsedMilliseconds.ToString());
+        }
     }
 }

@@ -24,7 +24,7 @@ namespace DataStorage.Analog
                 fileStream = null;
             }
         }
-        long prevOffset = 0;
+      
         public void Store(IndexRecord index, byte[] data, int length)
         {
             long offset = index.BeginOffset;
@@ -66,5 +66,37 @@ namespace DataStorage.Analog
 
         }
 
+        public byte[] GetRecord(IndexRecord indexRecord)
+        {
+            if (indexRecord.RecordLength > 10 * 1024 * 1024 || indexRecord.RecordLength<8) return null; //超过10M的记录或者不存在一条记录
+           
+            byte[] data=new byte[indexRecord.RecordLength];
+
+            long fileSize = fileStream.Length;
+            fileStream.Position = indexRecord.BeginOffset;
+
+            if (fileSize >= indexRecord.BeginOffset + indexRecord.RecordLength)
+            {
+                fileStream.Read(data, 0, data.Length);
+            }
+            else
+            {
+                int size1=(int)(fileSize-indexRecord.BeginOffset);
+                if(size1>0)
+                {
+                    fileStream.Read(data, 0, size1);
+                }
+                int size2 = indexRecord.RecordLength - size1;
+                if (size2 > 0)
+                {
+                    fileStream.Position = 0;
+                    fileStream.Read(data, size1, size2);
+                }
+               
+            }
+
+            return data;
+            
+        }
     }
 }

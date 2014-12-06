@@ -101,7 +101,7 @@ namespace DataStorage.Analog
             {
                 this.dataManager.PutDataBlock(currentBlock);
                 currentBlock = NewBlock(currentBlock, true);
-                currentBlock.IndexRecord.Type = (byte)((pointNum == -2) ? 1 : 0);
+                currentBlock.IndexRecord.Type = (pointNum == -2) ? FallbackType.Fallback : FallbackType.Normal;
                 currentBlock.AddAnalog(time, value, digit);
             }
 
@@ -183,8 +183,16 @@ namespace DataStorage.Analog
 
         public List<List<AnalogPoint>> GetAnalogPoint(DateTime timeBegin, DateTime timeEnd)
         {
-       
-            return null;
+
+            DataRequestBlock block = new DataRequestBlock(this, timeBegin, timeEnd);
+
+            dataManager.PutDataBlock(block);
+
+            block.Wait(5000);
+
+            return block.Result;
+
+            
         }
 
     }

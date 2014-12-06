@@ -47,6 +47,7 @@
     <Compile Include="Analog\DataStoreBlock.cs" />
     <Compile Include="Analog\FileData.cs" />
     <Compile Include="Analog\FileIndex.cs" />
+    <Compile Include="FallbackType.cs" />
     <Compile Include="MainForm1.cs">
       <SubType>Form</SubType>
     </Compile>

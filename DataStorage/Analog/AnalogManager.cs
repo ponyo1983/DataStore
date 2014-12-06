@@ -58,6 +58,17 @@ namespace DataStorage.Analog
         }
 
 
+        public List<List<AnalogPoint>> GetAnalogPoint(int type, int index, DateTime timeBegin, DateTime timeEnd)
+        {
+            int analogIndex = type * 10000 + index;
+            if (dicFile.ContainsKey(analogIndex) == false)
+            {
+                FileAnalog fileAnalog = new FileAnalog(this, type, index);
+                dicFile.Add(analogIndex, fileAnalog);
+            }
+          return  dicFile[analogIndex].GetAnalogPoint(timeBegin, timeEnd);
+        }
+
        
         /// <summary>
         /// 寻找现在已有的文件记录
