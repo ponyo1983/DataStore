@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Threading;
+using System.Collections;
 
 namespace DataStorage.Analog
 {
@@ -15,8 +17,9 @@ namespace DataStorage.Analog
         FileData fileData;
         FileIndex fileIndex;
 
-        DataStoreBlock[] blocks = new DataStoreBlock[BlockNum];
 
+        ManualResetEvent blockFinishedEvent = new ManualResetEvent(false);
+        Queue<DataStoreBlock> queueBlock = new Queue<DataStoreBlock>();
         DataStoreBlock currentBlock = null;
 
         int reserveCount = 0;
@@ -34,12 +37,12 @@ namespace DataStorage.Analog
 
             for (int i = 0; i < BlockNum; i++)
             {
-                blocks[i] = new DataStoreBlock(i,this);
+                queueBlock.Enqueue(new DataStoreBlock(i, this));
             }
           
             Random rnd = new Random();
 
-           // this.reserveCount = rnd.Next(DataStoreBlock.MaxPoint);
+            this.reserveCount = rnd.Next(DataStoreBlock.MaxPoint);
             currentBlock = NewBlock(null, false);
 
         }
@@ -79,6 +82,10 @@ namespace DataStorage.Analog
             {
                 if (pointNum + reserveCount >= DataStoreBlock.MaxPoint)
                 {
+                    if (currentBlock.IndexRecord.Index == 1)
+                    {
+ 
+                    }
                     this.dataManager.PutDataBlock(currentBlock);
                     currentBlock = NewBlock(currentBlock, false);
                     reserveCount = 0;
@@ -103,20 +110,46 @@ namespace DataStorage.Analog
             get { return fileIndex; }
         }
 
-      
 
-        private DataStoreBlock NewBlock(DataStoreBlock oldBlock,bool newIndex)
+        public void PutBlock(DataStoreBlock block)
         {
-            DataStoreBlock newBlock = null;
-            if (oldBlock == null)
+            lock (((ICollection)queueBlock).SyncRoot)
             {
-                newBlock = blocks[0];
+                queueBlock.Enqueue(block);
+                blockFinishedEvent.Set();
+            }
+            
+        }
+
+        private DataStoreBlock GetBlock(int timeout)
+        {
+            DataStoreBlock block = null;
+            lock (((ICollection)queueBlock).SyncRoot)
+            {
+                if (queueBlock.Count > 0)
+                {
+                    block = queueBlock.Dequeue();
+                }
+                else {
+                    blockFinishedEvent.Reset();
+                }
+            }
+            if (block != null || timeout == 0) return block;
+
+            if (timeout > 0)
+            {
+                blockFinishedEvent.WaitOne(timeout, false);
             }
             else
             {
-                int blkIndex=(oldBlock.Index + 1) % BlockNum;
-                newBlock = blocks[blkIndex];
+                blockFinishedEvent.WaitOne();
             }
+            return GetBlock(0);
+        }
+
+        private DataStoreBlock NewBlock(DataStoreBlock oldBlock,bool newIndex)
+        {
+            DataStoreBlock newBlock = GetBlock(-1);
             if ((oldBlock == null) && (!newIndex))
             {
                 newBlock.IndexRecord = fileIndex.LastIndex;
@@ -129,7 +162,6 @@ namespace DataStorage.Analog
             {
                 newBlock.IndexRecord = oldBlock.IndexRecord;
             }
-            newBlock.Wait(-1);
             newBlock.Clear();
             return newBlock;
             

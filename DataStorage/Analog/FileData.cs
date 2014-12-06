@@ -24,15 +24,14 @@ namespace DataStorage.Analog
                 fileStream = null;
             }
         }
-
+        long prevOffset = 0;
         public void Store(IndexRecord index, byte[] data, int length)
         {
             long offset = index.BeginOffset;
             long fileSize=fileStream.Length;
             long needSize = offset + index.RecordLength + length;
-            long wrPos = index.RecordLength + offset;
-            Console.WriteLine(wrPos/8);
-            if (fileSize < fileAnalog.MaxFileSize) //直接增长
+            long wrPos = (index.RecordLength + offset)%fileAnalog.MaxFileSize;
+            if (needSize <= fileAnalog.MaxFileSize)//直接写入
             {
                 if (fileSize < needSize)
                 {
@@ -60,6 +59,7 @@ namespace DataStorage.Analog
                     fileStream.Position = 0;
                     fileStream.Write(data, size1, size2);
                 }
+                fileStream.Flush();
             }
 
             index.RecordLength = index.RecordLength + length;

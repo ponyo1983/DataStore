@@ -87,7 +87,7 @@ namespace DataStorage.Analog
             recordLast.BeginOffset = 0;
             if (recordFirst.IsValid) //有效
             {
-                recordLast.BeginOffset = (recordFirst.BeginOffset + recordFirst.RealLength) % fileAnalog.MaxFileSize;
+                recordLast.BeginOffset = (uint)((recordFirst.BeginOffset + recordFirst.RealLength) % fileAnalog.MaxFileSize);
             }
             recordLast.FileIndex = recordFirst.FileIndex + 1; //文件记录索引
             recordLast.RecordLength = 0; //记录长度
@@ -103,6 +103,10 @@ namespace DataStorage.Analog
 
         public void Store(IndexRecord record)
         {
+            if (record.Index == 1)
+            {
+ 
+            }
             if (fileStream != null)
             {
                 byte[] data = record.GetBytes();

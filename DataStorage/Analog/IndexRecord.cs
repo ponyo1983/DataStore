@@ -18,8 +18,8 @@ namespace DataStorage.Analog
             time = BitConverter.ToUInt32(buffer, offset + 8); //结束时间
             this.EndTime = Utility.Unix2DateTime(time);
 
-            this.BeginOffset = BitConverter.ToInt64(buffer, offset + 12);
-            this.RecordLength = BitConverter.ToInt32(buffer, offset + 20);
+            this.BeginOffset = BitConverter.ToUInt32(buffer, offset + 12);
+            this.RecordLength = BitConverter.ToInt32(buffer, offset + 16);
             this.RealLength = RecordLength;
            
         }
@@ -100,7 +100,7 @@ namespace DataStorage.Analog
             set;
         }
 
-        public long BeginOffset
+        public uint BeginOffset
         {
             get;
             set;
@@ -135,7 +135,7 @@ namespace DataStorage.Analog
             time = Utility.DateTime2Unix(this.EndTime);
             BitConverter.GetBytes(time).CopyTo(data, 8);
             BitConverter.GetBytes(this.BeginOffset).CopyTo(data, 12);
-            BitConverter.GetBytes(this.RecordLength).CopyTo(data, 20);
+            BitConverter.GetBytes(this.RecordLength).CopyTo(data, 16);
           
             return data;
         }

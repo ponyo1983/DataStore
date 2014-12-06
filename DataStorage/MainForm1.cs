@@ -39,7 +39,7 @@ namespace DataStorage
         private void button1_Click(object sender, EventArgs e)
         {
             AnalogDataManager manager = AnalogDataManager.GetInstance();
-            manager.StoreDir = @"d:\DataStore";
+            manager.StoreDir = @"d:\Data";
             manager.Start();
         }
 
@@ -48,7 +48,7 @@ namespace DataStorage
 
             AnalogDataManager manager = AnalogDataManager.GetInstance();
             DateTime timeBase = DateTime.Now.Date;
-            for (int i = 0; i < 2*24*3600; i++)
+            for (int i = 0; i < 200*24*3600; i++)
             {
                 manager.AddData(0x11, 1, (byte)(i & 0xff), i, timeBase.AddSeconds(i));
             }
@@ -61,6 +61,27 @@ namespace DataStorage
 
             
             
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            string[] hexstr = textBox1.Text.Split(new char[] {' ' }, StringSplitOptions.RemoveEmptyEntries);
+            byte data = 0;
+            UInt32 unix = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                data = 0;
+                if (i < hexstr.Length)
+                {
+                    data = byte.Parse(hexstr[i], System.Globalization.NumberStyles.AllowHexSpecifier);
+                }
+                unix |= (UInt32)(((data) << (8 * i)));
+            }
+
+            DateTime time = Utility.Unix2DateTime(unix);
+
+            textBox2.Text = time.ToString("yyyy-MM-dd HH:mm:ss");
+
         }
     }
 }

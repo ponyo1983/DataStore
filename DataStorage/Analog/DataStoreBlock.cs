@@ -55,7 +55,7 @@ namespace DataStorage.Analog
                 fileAanlog.IndexFile.Store(this.IndexRecord);
             }
             finishedEvent.Set();
-            
+            fileAanlog.PutBlock(this);
         }
 
 
@@ -81,7 +81,7 @@ namespace DataStorage.Analog
             byte[] analogByte = BitConverter.GetBytes(value);
             Array.Copy(analogByte, 0, dataBuffer, index * 8+4, 4);
 
-            this.IndexRecord.RealLength++;
+            this.indexRecord.RealLength = this.indexRecord.RealLength + 8;
         }
 
         /// <summary>
